@@ -1,0 +1,13 @@
+{
+  "name": "node-elizabeth",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {},
+  "license": "MIT",
+  "dependencies": {
+    "babel-core": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "lodash": "^4.17.4",
+    "string-template": "^1.0.0"
+  }
+}
