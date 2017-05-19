@@ -1,5 +1,9 @@
+import os from 'os';
+import path from 'path';
+
 import _ from 'lodash';
 import fmt from 'string-template';
+
 import {
   pull,
   uniform,
@@ -47,12 +51,13 @@ export class Code {
 
   /**
    * Generate custom code using ascii uppercase and random integers.
-   * @param mask Mask of code.
-   * @param char Placeholder for characters.
-   * @param digit Placeholder for digits.
+   * @param opts.mask Mask of code.
+   * @param opts.char Placeholder for characters.
+   * @param opts.digit Placeholder for digits.
    * @returns {string}
    */
-  customCode(mask = '@###', char = '@', digit = '#') {
+  customCode(opts = {}) {
+    const { mask = '@###', char = '@', digit = '#'} = opts;
     return mask.split('').map((character) => {
       if (character === char) {
         return _.sample(asciiUpperCase);
@@ -422,9 +427,10 @@ export class Business {
  */
 export class Personal {
 
-  constructor(props) {
-    this.locale = props.locale;
-    this.data = pull('personal.json', props.locale);
+  constructor(props = {}) {
+    const { locale = 'en' } = props;
+    this.locale = locale;
+    this.data = pull('personal.json', locale);
     this.userNames = pull('personal.json', 'en').names;
     this._store = {
       age: 0,
@@ -462,9 +468,10 @@ export class Personal {
 
   /**
    * Get a random name.
-   * @param gender
+   * @param opts.gender
    */
-  name(gender = 'female') {
+  name(opts = {}) {
+    const { gender = 'female' } = opts;
     return _.sample(this.data.names[gender])
   }
 
@@ -503,10 +510,10 @@ export class Personal {
   /**
    * Get a random username with digits. Username generated
    * from names (en) for all locales.
-   * @param gender
-   * @returns {*}
+   * @param opts.gender
    */
-  username(gender = 'female') {
+  username(opts = {}) {
+    const { gender = 'female' } = opts;
     const formats = ['{0}{1}', '{0}_{1}', '{0}-{1}'];
     return fmt(
       _.sample(formats), _.sample(this.userNames[gender]), _.random(1, 9999)
@@ -1058,5 +1065,616 @@ export class Hardware {
   }
 }
 
-const address = new Hardware({ locale: 'ru'});
-console.log(address.ssdOrHdd({ noSQL: true}))
+/**
+ * Class for generate clothing sizes data
+ */
+export class ClothingSizes {
+
+  /**
+   * Get a random size in international format.
+   */
+  international() {
+    return _.sample([
+      'L', 'M', 'S',
+      'XL', 'XS', 'XXL',
+      'XXS', 'XXXL',
+    ])
+  }
+
+  // TODO: Improve this shit;
+  /**
+   * Generate a random clothing size in European format.
+   */
+  european() {
+    const sizes = [];
+    for (let i = 40; i < 62; i++) {
+      if (i % 2 === 0) {
+        sizes.push(i);
+      }
+    }
+    return _.sample(sizes);
+  }
+
+  /**
+   * Generate clothing size using custom format.
+   * @param opts.minimum Min value.
+   * @param opts.maximum Max value.
+   */
+  custom(opts = {}) {
+    const { minimum = 40, maximum = 62 } = opts;
+    return _.random(minimum, maximum);
+  }
+}
+
+/**
+ * Class for generate the internet data.
+ */
+export class Internet {
+
+  /**
+   * Get a random HTTP content type.
+   * @param opts.mimeType mime type;
+   */
+  contentType(opts = {}) {
+    const { mimeType = 'application' } = opts;
+    return fmt('Content-Type: {0}', new File().mimeType({ type: mimeType }));
+  }
+
+  /**
+   * Get a random HTTP status.
+   * @param opts.codeOnly Return only http status code.
+   */
+  httpStatusCode(opts = {}) {
+    const { codeOnly = true } = opts;
+    const status = _.sample(NETWORK.HTTP_STATUS_CODES);
+    if (codeOnly) {
+      return status.split(' ')[0];
+    }
+    return status;
+  }
+
+  /**
+   * Get a random HTTP method.
+   */
+  httpMethod() {
+    return _.sample(NETWORK.HTTP_METHODS);
+  }
+
+  /**
+   * Generate a random IPv4 address.
+   */
+  ipv4() {
+    return [...Array(4)].map(() => (_.random(0, 255))).join('.')
+  }
+
+  /**
+   * Generate a random IPv6 address.
+   */
+  ipv6() {
+    return fmt('2001:{0}',
+      [...Array(7)].map(() => _.random(0, Math.pow(16, 4)).toString(16)).join(':')
+    )
+  }
+
+  /**
+   * Generate a random MAC address.
+   */
+  macAddress() {
+    return 'XX:XX:XX:XX:XX:XX'.replace(/X/g, () => (
+      '0123456789ABCDEF'.charAt(Math.floor(Math.random() * 16))
+    ));
+  }
+
+  /**
+   * Get a random emoji shortcut code.
+   */
+  emoji() {
+    return _.sample(NETWORK.EMOJI);
+  }
+
+  /**
+   * Generate a link to the image placeholder.
+   * @param opts.width Image width
+   * @param opts.height Image height
+   */
+  imagePlaceholder(opts = {}) {
+    const { width = 400, height = 300} = opts;
+    return fmt('http://placehold.it/{width}x{height}', { width, height })
+  }
+
+  /**
+   * Get a random beautiful stock image that hosted on Unsplash.com
+   * @param opts.category Category of image. Available: 'buildings', 'food',
+   * 'nature', 'people', 'technology', 'objects'.
+   * @param opts.width Image width
+   * @param opts.height Image height
+   */
+  stockImage(opts = {}) {
+    let { category = null, width = 1900, height = 1080} = opts;
+    const categories = [
+      'buildings', 'food', 'nature', 'people', 'technology', 'objects'
+    ];
+    if (!category || !categories.includes(category)) {
+      category = _.sample(categories);
+    }
+    return fmt(
+      'https://source.unsplash.com/category/{category}/{width}x{height}',
+      { category, width, height }
+    );
+  }
+
+  // TODO : check
+  imageByKeyword(opts = {}) {
+    let { keyword = null } = opts;
+    const keywords = [
+      'cat', 'girl', 'boy', 'beauty', 'nature',
+      'woman', 'man', 'tech', 'space'
+    ];
+    if (!keyword) {
+      keyword = _.sample(keywords);
+    }
+    return fmt('https://source.unsplash.com/weekly?{0}', keyword)
+  }
+
+  // TODO: Add locale option for hashtags;
+  /**
+   * Create a list of hashtags (for Instagram, Twitter etc.)
+   * @param opts.quantity The quantity of hashtags.
+   * @param opts.category Available categories: general, girls, love,
+   * boys, friends, family, nature, travel, cars, sport, tumblr.
+   */
+  hashtags(opts = {}) {
+    const { quantity = 4, category = 'general'} = opts;
+    const hashtags = NETWORK.HASHTAGS[category];
+    if (quantity === 1) {
+      return _.sample(hashtags);
+    }
+    return [...Array(quantity)].map(() => (_.sample(hashtags)));
+  }
+
+  /**
+   * Generate a random home page.
+   * @param opts.gender Gender of author of site.
+   */
+  homePage(opts = {}) {
+    const { gender = 'female' } = opts;
+    return fmt('http://www.{0}{1}', new Personal().username({ gender }), _.sample(NETWORK.DOMAINS))
+  }
+
+  /**
+   * Get a random subreddit from the list.
+   * @param opts.nsfw NSFW subreddit.
+   * @param opts.fullUrl Full URL address
+   */
+  subReddit(opts = {}) {
+    const { nsfw = false, fullUrl = false } = opts;
+    const url = 'http://www.reddit.com';
+    if (!nsfw) {
+      if (!fullUrl) {
+        return _.sample(NETWORK.SUBREDDITS);
+      }
+      return fmt('{0}{1}', url, _.sample(NETWORK.SUBREDDITS));
+    }
+    const nsfwSr = _.sample(NETWORK.SUBREDDITS_NSFW);
+    return fullUrl ? fmt('{0}{1}', url, nsfwSr) : nsfwSr;
+  }
+
+  /**
+   * Get a random user agent.
+   */
+  userAgent() {
+    return _.sample(NETWORK.USER_AGENTS);
+  }
+
+  // TODO: Check data;
+  /**
+   * Get a random network protocol form OSI model.
+   * @param opts.layer Layer of protocol: application, data_link,
+   * network, physical, presentation, session and transport.
+   */
+  networkProtocol(opts = {}) {
+    const { layer = 'application' } = opts;
+  }
+}
+
+/**
+ * Class that provides dummy data about transport.
+ */
+export class Transport {
+
+  constructor() {
+    this._model = new Code().customCode;
+  }
+
+  /**
+   * Generate a truck model.
+   * @param opts.modelMask Mask of truck model. Here '@' is a \
+   * placeholder of characters and '#' is a placeholder of digits.
+   */
+  truck(opts = {}) {
+    const { modelMask = '#### @@'} = opts;
+    return fmt('{0}-{1}', _.sample(TRANSPORT.TRUCKS), this._model({ mask: modelMask }));
+  }
+
+  /**
+   * Get a random vehicle.
+   */
+  car() {
+    return _.sample(TRANSPORT.CARS);
+  }
+
+  /**
+   * Generate a dummy airplane model.
+   * @param opts.modelMask Mask of airplane model. Here '@' is a \
+   * placeholder of characters and '#' is a placeholder of digits.
+   */
+  airplane(opts = {}) {
+    const { modelMask = '###' } = opts;
+    return fmt('{0} {1}', _.sample(TRANSPORT.AIRPLANES), this._model({ mask: modelMask }));
+  }
+}
+
+/**
+ * Class that provides methods and property for generate paths.
+ */
+export class Path {
+
+  constructor() {
+    this._personanl = new Personal();
+  };
+
+  /**
+   * Generate a root dir path.
+   */
+  root() {
+    if (os.platform() === 'win32') {
+      return 'C:\\\\';
+    }
+    return '/';
+  }
+
+  /**
+   * Generate a home path.
+   */
+  home() {
+    if (os.platform() === 'win32') {
+      return `${this.root()}Users\\\\`
+    }
+    return `${this.root()}home/`
+  }
+
+  // TODO : Check platform differences;
+  /**
+   * Generate a random user.
+   * @param opts.gender Gender of user.
+   */
+  user(opts = {}) {
+    const { gender = 'female' } = opts;
+    const user = this._personanl.name({ gender });
+    return `${this.home()}${user}`
+  }
+
+  /**
+   * Generate a random path to user's folders.
+   * @param opts.gender
+   */
+  usersFolder(opts = {}) {
+    const { gender = 'female' } = opts;
+    return path.join(this.user({ gender }), _.sample(DEVELOPMENT.FOLDERS));
+  }
+
+  /**
+   * Generate a random path to development directory.
+   * @param opts.gender
+   */
+  devDir(opts = {}) {
+    const { gender = 'female' } = opts;
+    const devFolders = ['dev', 'development'];
+    return path.join(
+      this.user({ gender }),
+      _.sample(devFolders),
+      _.sample(DEVELOPMENT.PROGRAMMING_LANGS)
+    )
+  }
+
+  /**
+   * Generate a random path to project directory.
+   * @param opts.gender
+   */
+  projectDir(opts = {}) {
+    const { gender = 'female' } = opts;
+    return path.join(
+      this.devDir({ gender }),
+      _.sample(DEVELOPMENT.PROJECT_NAMES)
+    );
+  }
+}
+
+export class UnitSystem {
+
+  /**
+   * Get a mass unit name.
+   * @param opts.symbol Symbol of unit.
+   */
+  mass(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'gr'
+    }
+    return 'gram'
+  }
+
+  /**
+   * @param opts.symbol
+   */
+  information(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'b';
+    }
+    return 'byte'
+  }
+
+  /**
+   * Get the thermodynamic temperature unit name.
+   * @param opts.symbol Symbol of unit.
+   */
+  thermodynamicTemperature(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'K';
+    }
+    return 'kelvin'
+  }
+
+  /**
+   * Get unit name of amount of substance.
+   * @param opts.symbol Symbol of unit
+   */
+  amountOfSubstance(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'mol';
+    }
+    return 'mole'
+  }
+
+  /**
+   * Get unit name of angle.
+   * @param opts.symbol Symbol of unit.
+   */
+  angle(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'r';
+    }
+    return 'radian';
+  }
+
+  /**
+   * Get unit name if solid angle
+   * @param opts.symbol Symbol of unit.
+   */
+  solidAngle(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return '㏛';
+    }
+    return 'steradian'
+  }
+
+  /**
+   * Get unit name of frequency.
+   * @param opts.symbol Symbol of unit.
+   */
+  frequency(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'Hz';
+    }
+    return 'hertz'
+  }
+
+  /**
+   * Get unit name of force.
+   * @param.symbol Symbol of unit.
+   */
+  force(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'N';
+    }
+    return 'newton';
+  }
+
+  /**
+   * Get unit name of pressure.
+   * @param opts.symbol Symbol of unit.
+   */
+  pressure(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'P';
+    }
+    return 'pascal';
+  }
+
+  /**
+   * Get unit name of energy.
+   * @param opts.symbol Symbol of unit.
+   */
+  energy(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'J';
+    }
+    return 'joule'
+  }
+
+  /**
+   * Get unit name of power.
+   * @param opts.symbol Symbol of unit.
+   */
+  power(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'W';
+    }
+    return 'watt';
+  }
+
+  /**
+   * @param opts.symbol
+   */
+  flux(opts = {}) {
+    const { symbol = true } = opts;
+    return this.power({ symbol })
+  }
+
+  /**
+   * Get unit name of electric charge.
+   * @param opts.symbol Symbol of unit.
+   */
+  electricCharge(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'C';
+    }
+    return 'coulomb';
+  }
+
+  /**
+   * Get unit name of voltage.
+   * @param opts.symbol Symbol of unit;
+   */
+  voltage(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'V';
+    }
+    return 'volt';
+  }
+
+  /**
+   * Get unit name of electric capacitance.
+   * @param opts.symbol Symbol of unit;
+   */
+  electricCapacitance(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'F';
+    }
+    return 'farad';
+  }
+
+  /**
+   * Get name of electric resistance.
+   * @param opts.symbol Symbol of unit;
+   */
+  electricResistance(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'Ω';
+    }
+    return 'ohm';
+  }
+
+  impedance(opts = {}) {
+    const { symbol = false } = opts;
+    return this.electricResistance({ symbol });
+  }
+
+  // TODO: Clarify
+  reactance(opts = {}) {
+    const { symbol = false } = opts;
+    return this.electricResistance({ symbol });
+  }
+
+  /**
+   * Get unit name of electrical conductance.
+   * @param opts.symbol Symbol of unit.
+   */
+  electricalConductance(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'S';
+    }
+    return 'siemens'
+  }
+
+  /**
+   * Get unit name of magnetic flux.
+   * @param opts.symbol Symbol of unit.
+   */
+  magnetic_flux(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'Wb';
+    }
+    return 'weber';
+  }
+
+  /**
+   * Get unit name of magnetic flux density.
+   * @param opts.symbol Symbol of unit.
+   */
+  magneticFluxDensity(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'T';
+    }
+    return 'tesla';
+  }
+
+  /**
+   * Get unit name of inductance.
+   * @param opts.symbol Symbol of unit.
+   */
+  inductance(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'H';
+    }
+    return 'henry';
+  }
+
+  /**
+   * Get unit name of temperature.
+   * @param opts.symbol Symbol of unit.
+   */
+  temperature(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return '°C';
+    }
+    return 'Celsius';
+  }
+
+  /**
+   * Get unit name of radioactivity.
+   * @param opts.symbol Symbol of unit.
+   */
+  radioactivity(opts = {}) {
+    const { symbol = false } = opts;
+    if (symbol) {
+      return 'Bq';
+    }
+    return 'becquerel';
+  }
+
+  /**
+   * Get a random prefix for the International System of Units (SI)
+   * @param opts.sign Sing of number (positive, negative);
+   * @param opts.symbol Return symbol of prefix.
+   */
+  prefix(opts = {}) {
+    const { sign = 'positive', symbol = false } = opts;
+    if (!['positive', 'negative'].includes(sign)) {
+      throw new Error(`Unsupported sign. Use: 'positive' or 'negative'`);
+    }
+    const prefixes = symbol ?
+      SCIENTIFIC.SI_PREFIXES._sym_ :
+      SCIENTIFIC.SI_PREFIXES;
+    return _.sample(prefixes[sign])
+  }
+}
