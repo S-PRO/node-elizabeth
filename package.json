@@ -9,6 +9,9 @@
     "lodash": "^4.17.4",
     "string-template": "^1.0.0"
   },
+  "scripts": {
+    "test" : "node_modules/.bin/jest"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.24.1",
