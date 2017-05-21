@@ -11,19 +11,24 @@ export function pull(file, locale) {
 }
 
 export function luhnChecksum(num) {
-  let nCheck = 0, nDigit = 0, bEven = false;
-  num = num.replace(/\D/g, "");
-
-  for (let n = num.length - 1; n >= 0; n--) {
-    const cDigit = num.charAt(n);
-    nDigit = parseInt(cDigit, 10);
-    if (bEven) {
-      if ((nDigit *= 2) > 9) nDigit -= 9;
-    }
-    nCheck += nDigit;
-    bEven = !bEven;
+  let arr = [];
+  num = num.toString().replace(/\D\-|\s|\/|\*/g, '');
+  for(let i = 0; i < num.length; i++) {
+    if(i % 2 === 0) {
+      let m = parseInt(num[i]) * 2;
+      if(m > 9) {
+        arr.push(m - 9);
+      } else {
+        arr.push(m);
+      }
+    } else {
+        let n = parseInt(num[i]);
+        arr.push(n)
+      }
   }
-  return (nCheck % 10) == 0;
+  let sum = 0;
+  arr.map(item => sum += item)
+  return sum % 10;
 }
 
 export function uniform(a, b, fixed) {
