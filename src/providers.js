@@ -36,9 +36,11 @@ export class Structured {
 
   constructor(props = {}) {
     const { locale = 'en' } = props;
-    this.internet = 'Internet()';
+    this.internet = new Internet();
     this.text = new Text({ locale })
   }
+
+
 }
 
 
