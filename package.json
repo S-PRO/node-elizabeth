@@ -23,6 +23,6 @@
     "jsdoc": "^3.4.3"
   },
   "jest": {
-    "coverageReporters": ["text-summary"]
+    "coverageReporters": ["html"]
   }
 }
