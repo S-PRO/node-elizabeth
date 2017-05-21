@@ -3,12 +3,12 @@ import path from 'path';
 
 import _ from 'lodash';
 import fmt from 'string-template';
+import generator from 'creditcard-generator';
 
 import {
   pull,
   uniform,
   luhnChecksum,
-  asciiLowerCase,
   asciiUpperCase,
   asciiLetters,
   digits,
@@ -18,7 +18,6 @@ import * as ADDRESS from './locales/int/address';
 import * as BUSINESS from './locales/int/business';
 import * as CODE from './locales/int/code';
 import * as DATETIME from './locales/int/datetime';
-import * as DECORATOR from './locales/int/decorator';
 import * as DEVELOPMENT from './locales/int/development';
 import * as PERSONAL from './locales/int/personal';
 import * as FILE from './locales/int/file';
@@ -27,25 +26,75 @@ import * as NETWORK from './locales/int/network';
 import * as SCIENTIFIC from './locales/int/scientific';
 import * as TRANSPORT from './locales/int/transport';
 
-
-// TODO: IMPLEMENT;
 /**
- * Provider for structured text data such as CSS, Delimited, HTML, etc.
+ * Class for generate the fake data that you can use for
+ * working with date and time.
  */
-export class Structured {
+export class DateTime {
 
   constructor(props = {}) {
     const { locale = 'en' } = props;
-    this.internet = new Internet();
-    this.text = new Text({ locale })
+    this.locale = locale;
+    this.data = pull('datetime.json', locale);
   }
 
+  /**
+   * Get a random day of week.
+   * @param opts Options
+   * @param opts.abbr {boolean} Abbreviated name of the day.
+   */
+  dayOfWeek(opts = {}) {
+    const { abbr = false } = opts;
+    const key = abbr ? 'abbr' : 'name';
+    return _.sample(this.data.day[key]);
+  }
 
+  /**
+   * Get a random month.
+   * @param opts Options
+   * @param opts.abbr {boolean} if True then will be returned abbreviated month name.
+   */
+  month(opts = {}) {
+    const { abbr = false } = opts;
+    const key = abbr ? 'abbr' : 'name';
+    return this.data.month[key];
+  }
+
+  /**
+   * Generate a random year.
+   * @param opts Options
+   * @param opts.minimum {number} Minimum value.
+   * @param opts.maximum {number} Maximum value
+   */
+  year(opts = {}) {
+    const { minimum = 1990, maximum = 2050 } = opts;
+    return _.random(minimum, maximum);
+  }
+
+  /**
+   * Get a random value from list of centuries (roman format).
+   */
+  century() {
+    return _.sample(DATETIME.ROMAN_NUMS)
+  }
+
+  /**
+   * Get a random periodicity string.
+   */
+  periodicity() {
+    return _.sample(this.data.periodicity)
+  }
 }
 
-
+/**
+ * Class for generating codes;
+ */
 export class Code {
 
+  /**
+   * @param props Options
+   * @param props.locale Current locale
+   */
   constructor(props = {}) {
     const { locale = 'en' } = props;
     this.locale = locale;
@@ -53,10 +102,10 @@ export class Code {
 
   /**
    * Generate custom code using ascii uppercase and random integers.
-   * @param opts.mask Mask of code.
-   * @param opts.char Placeholder for characters.
-   * @param opts.digit Placeholder for digits.
-   * @returns {string}
+   * @param opts Options;
+   * @param opts.mask {string} Mask of code.
+   * @param opts.char {string} Placeholder for characters.
+   * @param opts.digit {string} Placeholder for digits.
    */
   customCode(opts = {}) {
     const { mask = '@###', char = '@', digit = '#'} = opts;
@@ -91,6 +140,7 @@ export class Code {
   /**
    * Generate ISBN for current locale. Default is ISBN 10,
    * but you also can use ISBN-13
+   * @param opts Options
    * @param opts.format ISBN format.
    */
   isbn(opts = {}) {
@@ -110,6 +160,7 @@ export class Code {
   /**
    * Generate EAN (European Article Number) code. Default is
    * EAN-13, but you also can use EAN-8.
+   * @param opts Options
    * @param opts.format Format of EAN.
    */
   ean(opts = {}) {
@@ -120,7 +171,6 @@ export class Code {
     return this.customCode(mask);
   }
 
-  // TODO: IMPROVE THIS SHIT
   /**
    * Generate a random IMEI (International Mobile Station Equipment Identity).
    */
@@ -131,6 +181,7 @@ export class Code {
 
   /**
    * Generate a random PIN code.
+   * @param opts Options
    * @param opts.mask Mask for PIN code.
    */
   pin(opts = {}) {
@@ -152,6 +203,7 @@ export class Text {
 
   /**
    * Get an alphabet for current locale.
+   * @param opts Options
    * @param opts.letterCase
    */
   alphabet(opts  = {}) {
@@ -168,6 +220,7 @@ export class Text {
 
   /**
    * Generate the text.
+   * @param opts Options
    * @param opts.quantity Quantity of sentences.
    */
   text(opts = {}) {
@@ -188,6 +241,7 @@ export class Text {
 
   /**
    * Get the random words.
+   * @param opts Options
    * @param opts.quantity Quantity of words. Default is 5.
    */
   words(opts = {}) {
@@ -211,7 +265,6 @@ export class Text {
 
   /**
    * Get a random quote.
-   * @returns {*}
    */
   quote() {
     return _.sample(this.data.quotes)
@@ -302,6 +355,7 @@ export class Address {
 
   /**
    * Get a random states or subject of country.
+   * @param opts Options
    * @param opts.abbr If True then return ISO (ISO 3166-2)
    * code of state/region/province/subject.
    */
@@ -320,6 +374,7 @@ export class Address {
 
   /**
    * Get a random ISO code of country.
+   * @param opts Options
    * @param opts.format Format of code (iso2, iso3, numeric).
    */
   countryISO(opts = {}) {
@@ -372,7 +427,8 @@ export class Address {
   /**
    * Get a random continent name or continent
    * code (code in international format)
-   * @param opts.code
+   * @param opts Options
+   * @param opts.code If true returns code.
    */
   continent(opts = {}) {
     const { code = false } = opts;
@@ -396,6 +452,7 @@ export class Business {
 
   /**
    * Get a random type of business entity.
+   * @param opts Options
    * @param opts.abbr If True then return abbreviated company type.
    */
   companyType(opts = {}) {
@@ -467,6 +524,7 @@ export class Personal {
 
   /**
    * Get a count of child's. Depend on previous generated age.
+   * @param opts Options
    * @param opts.maxChildren Maximum count of child's.
    */
   childCount(opts = {}) {
@@ -475,19 +533,21 @@ export class Personal {
     return age < 18 ? 0 : _.random(0, maxChildren);
   }
 
-  // TODO: Fix negative exp;
   /**
    * Get a work experience. Depend on previous generated age.
-   * @param opts.startFrom Age then person start to work.
+   * @param opts Options
+   * @param opts.startFrom { number} Age then person start to work.
    */
   workExperience(opts = {}) {
     const { startFrom = 22 } = opts;
     const age = this._store.age || this.age();
-    return age - startFrom || 0;
+    const experience = age - startFrom;
+    return experience < 0 ? 0 : experience;
   }
 
   /**
    * Get a random name.
+   * @param opts Options
    * @param opts.gender Person gender;
    */
   name(opts = {}) {
@@ -497,6 +557,7 @@ export class Personal {
 
   /**
    * Get a random surname.
+   * @param opts Options
    * @param opts.gender Person gender;
    */
   surname(opts = {}) {
@@ -509,6 +570,7 @@ export class Personal {
 
   /**
    * Get a random title (prefix/suffix) for name.
+   * @param opts Options
    * @param opts.gender Person gender;
    * @param opts.titleType The type of title ('typical' and 'academic').
    */
@@ -519,6 +581,7 @@ export class Personal {
 
   /**
    * Generate a random full name.
+   * @param opts Options
    * @param opts.gender
    * @param opts.reversed if true: surname/name else name/surname
    * @returns {*}
@@ -529,24 +592,22 @@ export class Personal {
     return fmt(string, this.name(gender), this.surname(gender));
   }
 
-  // TODO: username in lowercase;
   /**
    * Get a random username with digits. Username generated
    * from names (en) for all locales.
-   * @param opts.gender Person gender;
+   * @param opts Options
+   * @param opts.gender {string} Person gender;
    */
   username(opts = {}) {
     const { gender = 'female' } = opts;
     const formats = ['{0}{1}', '{0}_{1}', '{0}-{1}'];
     return fmt(
-      _.sample(formats), _.sample(this.userNames[gender]), _.random(1, 9999)
+      _.sample(formats), _.sample(this.userNames[gender]).toLowerCase(), _.random(1, 9999)
     );
   };
-
-  // TODO: implement password; https://github.com/lk-geimfari/elizabeth/blob/master/elizabeth/core/providers.py#L1009
-
   /**
    * Generate a random email.
+   * @param opts Options
    * @param opts.gender Person gender;
    * @param opts.domains Domains list; Default is gmail, yandex, yahoo, outlook, live;
    */
@@ -555,7 +616,6 @@ export class Personal {
     return `${this.username(gender)}${_.sample(domains)}`
   };
 
-  // TODO: Refactor this shit
   /**
    * Generate a random bitcoin address. Currently supported only two
    * address formats that are most popular: 'P2PKH' and 'P2SH'
@@ -573,11 +633,28 @@ export class Personal {
     return _.random(100, 999)
   }
 
-  // TODO: Implement
-  creditCardNumber() {}
+  /**
+   * Generate a random credit card number.
+   * @param opts Options
+   * @param opts.cardType Issuing Network. Default is Visa.
+   */
+  creditCardNumber(opts = {}) {
+    const { cardType = 'visa'} = opts;
+    if (['visa', 'vi', 'v'].includes(cardType)) {
+      return generator.GenCC('VISA')
+    }
+    if (['mastercard', 'm', 'mc', 'master'].includes(cardType)) {
+      return generator.GenCC('Mastercard')
+    }
+    if (['american_express', 'amex', 'ax', 'a'].includes(cardType)) {
+      return generator.GenCC('Amex')
+    }
+    throw new Error('Unsupported card type')
+  }
 
   /**
    * Generate a random expiration date for credit card.
+   * @param opts Options
    * @param opts.minimum Date of issue.
    * @param opts.maximum Maximum of expiration_date.
    * @returns {string}
@@ -606,6 +683,7 @@ export class Personal {
   // TODO : Add more socials;
   /**
    * Generate profile for random social network.
+   * @param opts Options
    * @param opts.gender Gender of user.
    */
   socialMediaProfile(opts = {}) {
@@ -623,6 +701,7 @@ export class Personal {
    * of human sexes is an international standard that defines a
    * representation of human sexes through a language-neutral single-digit
    * code or symbol of gender.
+   * @param opts Options
    * @param opts.iso5218
    * @param opts.symbol
    */
@@ -644,6 +723,7 @@ export class Personal {
 
   /**
    * Generate a random height in M (Meter).
+   * @param opts Options
    * @param opts.minimum
    * @param opts.maximum
    */
@@ -654,6 +734,7 @@ export class Personal {
 
   /**
    * Generate a random weight in Kg.
+   * @param opts Options
    * @param opts.minimum
    * @param opts.maximum
    */
@@ -671,6 +752,7 @@ export class Personal {
 
   /**
    * Get a random (LOL) sexual orientation.
+   * @param opts Options
    * @param opts.symbol Unicode symbol.
    */
   sexualOrientation(opts = {}) {
@@ -711,6 +793,7 @@ export class Personal {
 
   /**
    * Get a random nationality.
+   * @param opts Options
    * @param opts.gender Person gender;
     */
   nationality(opts = {}) {
@@ -771,20 +854,11 @@ export class Personal {
     return this.customCode(mask, '@', placeholder)
   }
 
-  // TODO: Implement after password
-  /**
-   * Generate a random avatar (link to avatar) using API of  Adorable.io.
-   *
-   */
-  avatar(opts = {}) {
-    const { size = 256 } = opts;
-
-  }
-
   /**
    * Generate a random identifier by mask. With this method you can generate
    * any identifiers that you need. Simply select the mask that you need.
-   * @param opts
+   * @param opts Options
+   * @param opts.mask
    */
   identifier(opts = {}) {
     const { mask = '##-##/##'} = opts;
@@ -806,7 +880,7 @@ export class File {
 
   /**
    * Get a random file extension from list.
-   * @param opts Method options
+   * @param opts Options
    * @param opts.fileType File type (source, text, data, audio, video, image,
    * executable, compressed).
    */
@@ -817,7 +891,7 @@ export class File {
 
   /**
    * Get a random mime type from list.
-   * @param opts Method options
+   * @param opts Options
    * @param opts.type Type of media: (application,
    * image, video, audio, text, message).
    */
@@ -850,7 +924,7 @@ export class Science {
 
   /**
    * Generate a random chemical element.
-   * @param opts Method options
+   * @param opts Options
    * @param opts.nameOnly If false then will be returned dict.
    */
   chemicalElement(opts = {}) {
@@ -891,7 +965,7 @@ export class Development {
 
   /**
    * Get a random database name.
-   * @param opts Method options
+   * @param opts Options
    * @param opts.noSQL only NoSQL databases.
    */
   database(opts = {}) {
@@ -1035,10 +1109,10 @@ export class Hardware {
     return `${uniform(1.5, 4.3, 1)}GHz`
   }
 
-  // TODO: Check options
   /**
    * Get a random generation.
-   * @param opts
+   * @param opts Options
+   * @param opts.abbr {boolean}
    */
   generation(opts = {}) {
     const { abbr = false } = opts;
@@ -1114,7 +1188,6 @@ export class ClothingSizes {
     ])
   }
 
-  // TODO: Improve this shit;
   /**
    * Generate a random clothing size in European format.
    */
@@ -1130,6 +1203,7 @@ export class ClothingSizes {
 
   /**
    * Generate clothing size using custom format.
+   * @param opts Options
    * @param opts.minimum Min value.
    * @param opts.maximum Max value.
    */
@@ -1146,7 +1220,8 @@ export class Internet {
 
   /**
    * Get a random HTTP content type.
-   * @param opts.mimeType mime type;
+   * @param opts Options
+   * @param opts.mimeType {string} mime type;
    */
   contentType(opts = {}) {
     const { mimeType = 'application' } = opts;
@@ -1155,7 +1230,8 @@ export class Internet {
 
   /**
    * Get a random HTTP status.
-   * @param opts.codeOnly Return only http status code.
+   * @param opts Options
+   * @param opts.codeOnly {boolean} Return only http status code.
    */
   httpStatusCode(opts = {}) {
     const { codeOnly = true } = opts;
@@ -1207,8 +1283,9 @@ export class Internet {
 
   /**
    * Generate a link to the image placeholder.
-   * @param opts.width Image width
-   * @param opts.height Image height
+   * @param opts Options
+   * @param opts.width {number} Image width
+   * @param opts.height {number} Image height
    */
   imagePlaceholder(opts = {}) {
     const { width = 400, height = 300} = opts;
@@ -1217,10 +1294,11 @@ export class Internet {
 
   /**
    * Get a random beautiful stock image that hosted on Unsplash.com
-   * @param opts.category Category of image. Available: 'buildings', 'food',
+   * @param opts Options
+   * @param opts.category {string} Category of image. Available: 'buildings', 'food',
    * 'nature', 'people', 'technology', 'objects'.
-   * @param opts.width Image width
-   * @param opts.height Image height
+   * @param opts.width {number} Image width
+   * @param opts.height {number} Image height
    */
   stockImage(opts = {}) {
     let { category = null, width = 1900, height = 1080} = opts;
@@ -1236,7 +1314,12 @@ export class Internet {
     );
   }
 
-  // TODO : check
+  /**
+   * Get image by keyword;
+   * @param opts Options
+   * @param opts.keyword {string} Image keyword. Available: 'cat', 'girl', 'boy', 'beauty', 'nature',
+   * 'woman', 'man', 'tech', 'space'
+   */
   imageByKeyword(opts = {}) {
     let { keyword = null } = opts;
     const keywords = [
@@ -1252,8 +1335,9 @@ export class Internet {
   // TODO: Add locale option for hashtags;
   /**
    * Create a list of hashtags (for Instagram, Twitter etc.)
-   * @param opts.quantity The quantity of hashtags.
-   * @param opts.category Available categories: general, girls, love,
+   * @param opts Options
+   * @param opts.quantity {number} The quantity of hashtags.
+   * @param opts.category {string} Available categories: general, girls, love,
    * boys, friends, family, nature, travel, cars, sport, tumblr.
    */
   hashtags(opts = {}) {
@@ -1267,7 +1351,8 @@ export class Internet {
 
   /**
    * Generate a random home page.
-   * @param opts.gender Gender of author of site.
+   * @param opts Options
+   * @param opts.gender {string} Gender of author of site.
    */
   homePage(opts = {}) {
     const { gender = 'female' } = opts;
@@ -1276,8 +1361,9 @@ export class Internet {
 
   /**
    * Get a random subreddit from the list.
-   * @param opts.nsfw NSFW subreddit.
-   * @param opts.fullUrl Full URL address
+   * @param opts Options
+   * @param opts.nsfw {boolean} NSFW subreddit.
+   * @param opts.fullUrl {boolean} Full URL address
    */
   subReddit(opts = {}) {
     const { nsfw = false, fullUrl = false } = opts;
@@ -1298,16 +1384,6 @@ export class Internet {
   userAgent() {
     return _.sample(NETWORK.USER_AGENTS);
   }
-
-  // TODO: Check data;
-  /**
-   * Get a random network protocol form OSI model.
-   * @param opts.layer Layer of protocol: application, data_link,
-   * network, physical, presentation, session and transport.
-   */
-  networkProtocol(opts = {}) {
-    const { layer = 'application' } = opts;
-  }
 }
 
 /**
@@ -1321,7 +1397,8 @@ export class Transport {
 
   /**
    * Generate a truck model.
-   * @param opts.modelMask Mask of truck model. Here '@' is a \
+   * @param opts Options
+   * @param opts.modelMask {string} Mask of truck model. Here '@' is a \
    * placeholder of characters and '#' is a placeholder of digits.
    */
   truck(opts = {}) {
@@ -1338,7 +1415,8 @@ export class Transport {
 
   /**
    * Generate a dummy airplane model.
-   * @param opts.modelMask Mask of airplane model. Here '@' is a \
+   * @param opts Options
+   * @param opts.modelMask {string} Mask of airplane model. Here '@' is a \
    * placeholder of characters and '#' is a placeholder of digits.
    */
   airplane(opts = {}) {
@@ -1376,10 +1454,10 @@ export class Path {
     return `${this.root()}home/`
   }
 
-  // TODO : Check platform differences;
   /**
    * Generate a random user.
-   * @param opts.gender Gender of user.
+   * @param opts Options
+   * @param opts.gender {string} Gender of user.
    */
   user(opts = {}) {
     const { gender = 'female' } = opts;
@@ -1389,7 +1467,8 @@ export class Path {
 
   /**
    * Generate a random path to user's folders.
-   * @param opts.gender
+   * @param opts Options
+   * @param opts.gender {string} Gender of user
    */
   usersFolder(opts = {}) {
     const { gender = 'female' } = opts;
@@ -1398,7 +1477,8 @@ export class Path {
 
   /**
    * Generate a random path to development directory.
-   * @param opts.gender
+   * @param opts Options
+   * @param opts.gender {string} Gender of user
    */
   devDir(opts = {}) {
     const { gender = 'female' } = opts;
@@ -1412,7 +1492,8 @@ export class Path {
 
   /**
    * Generate a random path to project directory.
-   * @param opts.gender
+   * @param opts Options
+   * @param opts.gender {string} Gender of user
    */
   projectDir(opts = {}) {
     const { gender = 'female' } = opts;
@@ -1423,11 +1504,15 @@ export class Path {
   }
 }
 
+/**
+ * 11
+ */
 export class UnitSystem {
 
   /**
    * Get a mass unit name.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   mass(opts = {}) {
     const { symbol = false } = opts;
@@ -1438,7 +1523,8 @@ export class UnitSystem {
   }
 
   /**
-   * @param opts.symbol
+   * @param opts Options
+   * @param opts.symbol {boolean}
    */
   information(opts = {}) {
     const { symbol = false } = opts;
@@ -1450,7 +1536,8 @@ export class UnitSystem {
 
   /**
    * Get the thermodynamic temperature unit name.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   thermodynamicTemperature(opts = {}) {
     const { symbol = false } = opts;
@@ -1462,7 +1549,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of amount of substance.
-   * @param opts.symbol Symbol of unit
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit
    */
   amountOfSubstance(opts = {}) {
     const { symbol = false } = opts;
@@ -1474,7 +1562,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of angle.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   angle(opts = {}) {
     const { symbol = false } = opts;
@@ -1486,7 +1575,8 @@ export class UnitSystem {
 
   /**
    * Get unit name if solid angle
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   solidAngle(opts = {}) {
     const { symbol = false } = opts;
@@ -1498,7 +1588,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of frequency.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   frequency(opts = {}) {
     const { symbol = false } = opts;
@@ -1510,7 +1601,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of force.
-   * @param.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   force(opts = {}) {
     const { symbol = false } = opts;
@@ -1522,7 +1614,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of pressure.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   pressure(opts = {}) {
     const { symbol = false } = opts;
@@ -1534,7 +1627,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of energy.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   energy(opts = {}) {
     const { symbol = false } = opts;
@@ -1546,7 +1640,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of power.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   power(opts = {}) {
     const { symbol = false } = opts;
@@ -1557,7 +1652,8 @@ export class UnitSystem {
   }
 
   /**
-   * @param opts.symbol
+   * @param opts Options
+   * @param opts.symbol {boolean}
    */
   flux(opts = {}) {
     const { symbol = true } = opts;
@@ -1566,7 +1662,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of electric charge.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   electricCharge(opts = {}) {
     const { symbol = false } = opts;
@@ -1578,7 +1675,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of voltage.
-   * @param opts.symbol Symbol of unit;
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit;
    */
   voltage(opts = {}) {
     const { symbol = false } = opts;
@@ -1590,7 +1688,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of electric capacitance.
-   * @param opts.symbol Symbol of unit;
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit;
    */
   electricCapacitance(opts = {}) {
     const { symbol = false } = opts;
@@ -1602,7 +1701,8 @@ export class UnitSystem {
 
   /**
    * Get name of electric resistance.
-   * @param opts.symbol Symbol of unit;
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit;
    */
   electricResistance(opts = {}) {
     const { symbol = false } = opts;
@@ -1617,7 +1717,6 @@ export class UnitSystem {
     return this.electricResistance({ symbol });
   }
 
-  // TODO: Clarify
   reactance(opts = {}) {
     const { symbol = false } = opts;
     return this.electricResistance({ symbol });
@@ -1625,7 +1724,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of electrical conductance.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   electricalConductance(opts = {}) {
     const { symbol = false } = opts;
@@ -1637,7 +1737,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of magnetic flux.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   magnetic_flux(opts = {}) {
     const { symbol = false } = opts;
@@ -1649,7 +1750,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of magnetic flux density.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   magneticFluxDensity(opts = {}) {
     const { symbol = false } = opts;
@@ -1661,7 +1763,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of inductance.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   inductance(opts = {}) {
     const { symbol = false } = opts;
@@ -1673,7 +1776,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of temperature.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   temperature(opts = {}) {
     const { symbol = false } = opts;
@@ -1685,7 +1789,8 @@ export class UnitSystem {
 
   /**
    * Get unit name of radioactivity.
-   * @param opts.symbol Symbol of unit.
+   * @param opts Options
+   * @param opts.symbol {boolean} Symbol of unit.
    */
   radioactivity(opts = {}) {
     const { symbol = false } = opts;
@@ -1697,8 +1802,9 @@ export class UnitSystem {
 
   /**
    * Get a random prefix for the International System of Units (SI)
-   * @param opts.sign Sing of number (positive, negative);
-   * @param opts.symbol Return symbol of prefix.
+   * @param opts Options
+   * @param opts.sign {string} Sing of number (positive, negative);
+   * @param opts.symbol {boolean} Return symbol of prefix.
    */
   prefix(opts = {}) {
     const { sign = 'positive', symbol = false } = opts;

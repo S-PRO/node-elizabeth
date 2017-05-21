@@ -1,0 +1,16 @@
+{
+  "opts": {
+    "encoding": "utf8",
+    "destination": "./doc/",
+    "recurse": true
+  },
+  "source": {
+    "include": [ "src/providers.js"],
+    "includePattern": ".+\\.js(doc)?$"
+  },
+  "templates": {
+    "default": {
+      "outputSourceFiles": false
+    }
+  }
+}
