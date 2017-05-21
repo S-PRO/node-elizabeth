@@ -57,7 +57,7 @@ export class DateTime {
   month(opts = {}) {
     const { abbr = false } = opts;
     const key = abbr ? 'abbr' : 'name';
-    return this.data.month[key];
+    return _.sample(this.data.month[key]);
   }
 
   /**
