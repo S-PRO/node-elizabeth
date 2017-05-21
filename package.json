@@ -1,6 +1,6 @@
 {
   "name": "node-elizabeth",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "repository": {},
   "license": "MIT",
@@ -18,7 +18,7 @@
     "jsdoc": "^3.4.3"
   },
   "scripts": {
-    "build-doc": "jsdoc -c jsdoc.json",
-    "build": "babel src --out-dir lib"
+    "build-doc": "node_modules/.bin/jsdoc -c jsdoc.json",
+    "build": "node_modules/.bin/babel src --out-dir lib | node_modules/.bin/babel src --out-dir lib --copy-files"
   }
 }

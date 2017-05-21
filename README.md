@@ -11,7 +11,7 @@ addresses, usernames, first names, last names, etc.
 
 Installation
 ============
-```$~ yarn add node-elizabeth -D```
+`yarn add node-elizabeth`
 
 Basic Usage
 ===========
@@ -21,4 +21,9 @@ import { Personal } from 'node-elizabeth';
 // default locale is 'en'
 const person = new Personal();
 const fullName = person.fullName({ gender: 'male' });
-// Antonetta Garrison
+// Inell Britt
+```
+
+Locales
+=======
+
