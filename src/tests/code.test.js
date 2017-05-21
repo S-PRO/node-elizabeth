@@ -18,7 +18,6 @@ describe('Test code provider', () => {
   });
 
   it('should return item from 8  and 13 digits', () => {
-    console.log(code.ean('ean-8'));
     expect(code.ean({format: 'ean-8'})).toMatch(/^[0-9]{8}$/);
     expect(code.ean({format: 'ean-13'})).toMatch(/^[0-9]{13}$/);
   })
