@@ -79,17 +79,20 @@ export class Code {
 
   /**
    * Generate a random International Standard Serial Number (ISSN).
+   * @param opts.mask Code mask
    */
-  issn(mask = '####-####') {
+  issn(opts = {}) {
+    const { mask = '####-####' } = opts;
     return this.customCode(mask)
   }
 
   /**
    * Generate ISBN for current locale. Default is ISBN 10,
    * but you also can use ISBN-13
-   * @param format ISBN format.
+   * @param opts.format ISBN format.
    */
-  isbn(format = 'isbn-10') {
+  isbn(opts = {}) {
+    const { format = 'isbn-10' } = opts;
     const groups = CODE.ISBN_GROUPS;
     let mask = format === 'isbn-13' ?
       '###-{0}-#####-###-#' :
@@ -105,9 +108,10 @@ export class Code {
   /**
    * Generate EAN (European Article Number) code. Default is
    * EAN-13, but you also can use EAN-8.
-   * @param format Format of EAN.
+   * @param opts.format Format of EAN.
    */
-  ean(format = 'ean-13') {
+  ean(opts = {}) {
+    const { format = 'ean-13' } = opts;
     const mask = format === 'ean-8' ?
       '########' :
       '#############';
@@ -125,9 +129,10 @@ export class Code {
 
   /**
    * Generate a random PIN code.
-   * @param mask Mask for PIN code.
+   * @param opts.mask Mask for PIN code.
    */
-  pin(mask = '####') {
+  pin(opts = {}) {
+    const { mask = '####' } = opts;
     return this.customCode(mask);
   }
 }
@@ -137,16 +142,18 @@ export class Code {
  */
 export class Text {
 
-  constructor(props) {
-    this.locale = props.locale;
-    this.data = pull('text.json', props.locale);
+  constructor(opts = {}) {
+    const { locale = 'en' } = opts;
+    this.locale = locale;
+    this.data = pull('text.json', locale);
   }
 
   /**
    * Get an alphabet for current locale.
-   * @param letterCase
+   * @param opts.letterCase
    */
-  alphabet(letterCase = 'uppercase') {
+  alphabet(opts  = {}) {
+    const { letterCase = 'uppercase' } = opts;
     return this.data.alphabet[letterCase];
   }
 
@@ -159,9 +166,10 @@ export class Text {
 
   /**
    * Generate the text.
-   * @param quantity Quantity of sentences.
+   * @param opts.quantity Quantity of sentences.
    */
-  text(quantity = 5) {
+  text(opts = {}) {
+    const { quantity = 5 } = opts;
     let text = '';
     [...Array(quantity)].forEach(() => {
       text += _.sample(this.data.text)
@@ -178,9 +186,10 @@ export class Text {
 
   /**
    * Get the random words.
-   * @param quantity Quantity of words. Default is 5.
+   * @param opts.quantity Quantity of words. Default is 5.
    */
-  words(quantity = 5) {
+  words(opts = {}) {
+    const { quantity = 5 } = opts;
     return [...Array(quantity)].map(() => _.sample(this.data.words.normal))
   }
 
@@ -234,9 +243,10 @@ export class Text {
  */
 export class Address {
 
-  constructor(props) {
-    this.locale = props.locale;
-    this.data = pull('address.json', props.locale);
+  constructor(opts = {}) {
+    const { locale = 'en' } = opts;
+    this.locale = locale;
+    this.data = pull('address.json', locale);
   }
 
   /**
@@ -290,10 +300,11 @@ export class Address {
 
   /**
    * Get a random states or subject of country.
-   * @param abbr If True then return ISO (ISO 3166-2)
+   * @param opts.abbr If True then return ISO (ISO 3166-2)
    * code of state/region/province/subject.
    */
-  state(abbr = false) {
+  state(opts = {}) {
+    const { abbr = false } = opts;
     const key = abbr ? 'abbr' : 'name';
     return _.sample(this.data.state[key])
   }
@@ -307,10 +318,10 @@ export class Address {
 
   /**
    * Get a random ISO code of country.
-   * @param format Format of code (iso2, iso3, numeric).
-   * @returns {*}
+   * @param opts.format Format of code (iso2, iso3, numeric).
    */
-  countryISO(format = 'iso2') {
+  countryISO(opts = {}) {
+    const { format = 'iso2' } = opts;
     const supported = Object.keys(ADDRESS.COUNTRIES_ISO);
     if (!supported.includes(format)) {
       throw new Error(fmt('Unsupported format. Use: {0}', supported.toString()))
@@ -358,10 +369,11 @@ export class Address {
 
   /**
    * Get a random continent name or continent
-   code (code in international format)
-   * @param code
+   * code (code in international format)
+   * @param opts.code
    */
-  continent(code = false) {
+  continent(opts = {}) {
+    const { code = false } = opts;
     if (code) {
       return _.sample(ADDRESS.CONTINENT_CODES)
     }
@@ -374,16 +386,18 @@ export class Address {
  */
 export class Business {
 
-  constructor(props) {
-    this.locale = props.locale;
-    this.data = pull('business.json', props.locale);
+  constructor(props = {}) {
+    const { locale = 'en' } = props;
+    this.locale = locale;
+    this.data = pull('business.json', locale);
   }
 
   /**
    * Get a random type of business entity.
-   * @param abbr If True then return abbreviated company type.
+   * @param opts.abbr If True then return abbreviated company type.
    */
-  companyType(abbr = false) {
+  companyType(opts = {}) {
+    const { abbr = false } = opts;
     const key = abbr ? 'abbr' : 'title';
     return _.sample(this.data.company.type[key]);
   }
@@ -412,7 +426,8 @@ export class Business {
   /**
    * Generate a random price.
    */
-  price(minimum = 10, maximum = 1000) {
+  price(opts = {}) {
+    const { minimum = 10, maximum = 1000 } = opts;
     const currencies = BUSINESS.CURRENCY_SYMBOLS;
     if (Object.keys(currencies).includes(this.locale)) {
       return `${uniform(minimum, maximum, 2)} ${currencies[this.locale]}`;
@@ -441,7 +456,8 @@ export class Personal {
   /**
    * Get a random integer value.
    */
-  age(minimum = 16, maximum = 66) {
+  age(opts = {}) {
+    const { minimum = 16, maximum = 66 } = opts;
     const num = _.random(minimum, maximum);
     this._store.age = num;
     return num
@@ -449,9 +465,10 @@ export class Personal {
 
   /**
    * Get a count of child's. Depend on previous generated age.
-   * @param maxChildren Maximum count of child's.
+   * @param opts.maxChildren Maximum count of child's.
    */
-  childCount(maxChildren = 5) {
+  childCount(opts = {}) {
+    const { maxChildren = 5 } = opts;
     const age = this._store.age || this.age();
     return age < 18 ? 0 : _.random(0, maxChildren);
   }
@@ -459,16 +476,17 @@ export class Personal {
   // TODO: Fix negative exp;
   /**
    * Get a work experience. Depend on previous generated age.
-   * @param startFrom Age then person start to work.
+   * @param opts.startFrom Age then person start to work.
    */
-  workExperience(startFrom = 22) {
+  workExperience(opts = {}) {
+    const { startFrom = 22 } = opts;
     const age = this._store.age || this.age();
     return age - startFrom || 0;
   }
 
   /**
    * Get a random name.
-   * @param opts.gender
+   * @param opts.gender Person gender;
    */
   name(opts = {}) {
     const { gender = 'female' } = opts;
@@ -477,9 +495,10 @@ export class Personal {
 
   /**
    * Get a random surname.
-   * @param gender
+   * @param opts.gender Person gender;
    */
-  surname(gender = 'female') {
+  surname(opts = {}) {
+    const { gender = 'female' } = opts;
     if (['ru', 'is', 'uk'].includes(this.locale)) {
       return _.sample(this.data.surnames[gender]);
     }
@@ -488,20 +507,22 @@ export class Personal {
 
   /**
    * Get a random title (prefix/suffix) for name.
-   * @param gender
-   * @param titleType The type of title ('typical' and 'academic').
+   * @param opts.gender Person gender;
+   * @param opts.titleType The type of title ('typical' and 'academic').
    */
-  title(gender = 'female', titleType = 'typical') {
+  title(opts = {}) {
+    const { gender = 'female', titleType = 'typical' } = opts;
     return _.sample(this.data.title[gender][titleType])
   }
 
   /**
    * Generate a random full name.
-   * @param gender
-   * @param reversed if true: surname/name else name/surname
+   * @param opts.gender
+   * @param opts.reversed if true: surname/name else name/surname
    * @returns {*}
    */
-  fullName(gender = 'female', reversed = false) {
+  fullName(opts = {}) {
+    const { gender = 'female', reversed = false } = opts;
     const string = reversed ? '{1} {0}' : '{0} {1}';
     return fmt(string, this.name(gender), this.surname(gender));
   }
@@ -510,7 +531,7 @@ export class Personal {
   /**
    * Get a random username with digits. Username generated
    * from names (en) for all locales.
-   * @param opts.gender
+   * @param opts.gender Person gender;
    */
   username(opts = {}) {
     const { gender = 'female' } = opts;
@@ -524,10 +545,11 @@ export class Personal {
 
   /**
    * Generate a random email.
-   * @param gender
-   * @param domains
+   * @param opts.gender Person gender;
+   * @param opts.domains Domains list; Default is gmail, yandex, yahoo, outlook, live;
    */
-  email(gender = 'female', domains = NETWORK.EMAIL_DOMAINS) {
+  email(opts = {}) {
+    const { gender = 'female', domains = NETWORK.EMAIL_DOMAINS } = opts;
     return `${this.username(gender)}${_.sample(domains)}`
   };
 
@@ -554,11 +576,12 @@ export class Personal {
 
   /**
    * Generate a random expiration date for credit card.
-   * @param minimum Date of issue.
-   * @param maximum Maximum of expiration_date.
+   * @param opts.minimum Date of issue.
+   * @param opts.maximum Maximum of expiration_date.
    * @returns {string}
    */
-  creditCardExpirationDate(minimum = 16, maximum = 25) {
+  creditCardExpirationDate(opts = {}) {
+    const { minimum = 16, maximum = 25 } = opts;
     const month = _.random(1, 12);
     const year = _.random(minimum, maximum);
     return `${month < 10 ? '0' + month : month}/${year}`
@@ -578,11 +601,13 @@ export class Personal {
     return this.email();
   }
 
+  // TODO : Add more socials;
   /**
    * Generate profile for random social network.
-   * @param gender Gender of user.
+   * @param opts.gender Gender of user.
    */
-  socialMediaProfile(gender = 'female') {
+  socialMediaProfile(opts = {}) {
+    const { gender = 'female' } = opts;
     const urls = [
       'http://facebook.com/{0}',
       'http://twitter.com/{0}',
@@ -596,10 +621,11 @@ export class Personal {
    * of human sexes is an international standard that defines a
    * representation of human sexes through a language-neutral single-digit
    * code or symbol of gender.
-   * @param iso5218
-   * @param symbol
+   * @param opts.iso5218
+   * @param opts.symbol
    */
-  gender(iso5218 = false, symbol = false) {
+  gender(opts = {}) {
+    const { iso5218 = false, symbol = false } = opts;
     // The four codes specified in ISO/IEC 5218 are:
     // 0 = not known,
     // 1 = male,
@@ -616,23 +642,26 @@ export class Personal {
 
   /**
    * Generate a random height in M (Meter).
-   * @returns {*}
+   * @param opts.minimum
+   * @param opts.maximum
    */
-  height(minimum = 1.5, maximum = 2) {
+  height(opts = {}) {
+    const { minimum = 1.5, maximum = 2 } = opts;
     return uniform(minimum, maximum, 2)
   }
 
   /**
    * Generate a random weight in Kg.
-   * @returns {*}
+   * @param opts.minimum
+   * @param opts.maximum
    */
-  weight(minimum = 38, maximum = 90) {
+  weight(opts = {}) {
+    const { minimum = 38, maximum = 90 } = opts;
     return uniform(minimum, maximum, 2)
   }
 
   /**
    * Get a random blood type.
-   * @returns {*}
    */
   bloodType() {
     return _.sample(PERSONAL.BLOOD_GROUPS);
@@ -640,9 +669,10 @@ export class Personal {
 
   /**
    * Get a random (LOL) sexual orientation.
-   * @param symbol Unicode symbol.
+   * @param opts.symbol Unicode symbol.
    */
-  sexualOrientation(symbol = false) {
+  sexualOrientation(opts = {}) {
+    const { symbol = false } = opts;
     if (symbol) {
       return _.sample(PERSONAL.SEXUALITY_SYMBOLS);
     }
@@ -679,9 +709,10 @@ export class Personal {
 
   /**
    * Get a random nationality.
-   * @param gender
-   */
-  nationality(gender = 'female') {
+   * @param opts.gender Person gender;
+    */
+  nationality(opts = {}) {
+    const { gender = 'female' } = opts;
     const separatedLocales = ['ru', 'uk'];
     if (separatedLocales.includes(this.locale)) {
       return _.sample(this.data.nationality[gender]);
