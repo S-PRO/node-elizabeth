@@ -134,7 +134,7 @@ export class Code {
    */
   issn(opts = {}) {
     const { mask = '####-####' } = opts;
-    return this.customCode(mask)
+    return this.customCode({ mask })
   }
 
   /**
@@ -154,7 +154,7 @@ export class Code {
     } else {
       mask = fmt(mask, groups.default);
     }
-    return this.customCode(mask);
+    return this.customCode({ mask });
   }
 
   /**
@@ -168,14 +168,14 @@ export class Code {
     const mask = format === 'ean-8' ?
       '########' :
       '#############';
-    return this.customCode(mask);
+    return this.customCode({ mask });
   }
 
   /**
    * Generate a random IMEI (International Mobile Station Equipment Identity).
    */
   imei() {
-    const num = _.sample(CODE.IMEI_TACS) + this.customCode('######');
+    const num = _.sample(CODE.IMEI_TACS) + this.customCode({mask: '######'});
     return num + luhnChecksum(num);
   }
 
@@ -186,7 +186,7 @@ export class Code {
    */
   pin(opts = {}) {
     const { mask = '####' } = opts;
-    return this.customCode(mask);
+    return this.customCode({ mask });
   }
 }
 
