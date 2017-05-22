@@ -207,5 +207,5 @@ describe('Test personal provider', () => {
 
   it('should return random level of english', () => {
     expect(ENGLISH_LEVEL).toContain(personal.levelOfEnglish());
-  })
+  });
 });
