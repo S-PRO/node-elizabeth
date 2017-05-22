@@ -472,7 +472,7 @@ export class Business {
    * Generate a random copyright.
    */
   copyright() {
-    return `© ${this.company()}, ${this.companyType(true)}`
+    return `© ${this.company()}, ${this.companyType({ abbr: true})}`
   }
 
   /**
@@ -484,6 +484,9 @@ export class Business {
 
   /**
    * Generate a random price.
+   * @param opts Options
+   * @param opts.minimum {number}
+   * @param opts.maximum {number}
    */
   price(opts = {}) {
     const { minimum = 10, maximum = 1000 } = opts;
@@ -514,6 +517,9 @@ export class Personal {
 
   /**
    * Get a random integer value.
+   * @param opts Options
+   * @param opts.minimum {number} Minimum value
+   * @param opts.maximum {number} Maximum value
    */
   age(opts = {}) {
     const { minimum = 16, maximum = 66 } = opts;
@@ -589,7 +595,7 @@ export class Personal {
   fullName(opts = {}) {
     const { gender = 'female', reversed = false } = opts;
     const string = reversed ? '{1} {0}' : '{0} {1}';
-    return fmt(string, this.name(gender), this.surname(gender));
+    return fmt(string, this.name({ gender }), this.surname({ gender }));
   }
 
   /**
@@ -613,7 +619,7 @@ export class Personal {
    */
   email(opts = {}) {
     const { gender = 'female', domains = NETWORK.EMAIL_DOMAINS } = opts;
-    return `${this.username(gender)}${_.sample(domains)}`
+    return `${this.username({ gender })}${_.sample(domains)}`
   };
 
   /**
@@ -641,13 +647,13 @@ export class Personal {
   creditCardNumber(opts = {}) {
     const { cardType = 'visa'} = opts;
     if (['visa', 'vi', 'v'].includes(cardType)) {
-      return generator.GenCC('VISA')
+      return generator.GenCC('VISA')[0]
     }
     if (['mastercard', 'm', 'mc', 'master'].includes(cardType)) {
-      return generator.GenCC('Mastercard')
+      return generator.GenCC('Mastercard')[0]
     }
     if (['american_express', 'amex', 'ax', 'a'].includes(cardType)) {
-      return generator.GenCC('Amex')
+      return generator.GenCC('Amex')[0]
     }
     throw new Error('Unsupported card type')
   }
@@ -862,7 +868,7 @@ export class Personal {
    */
   identifier(opts = {}) {
     const { mask = '##-##/##'} = opts;
-    return this.customCode(mask)
+    return this.customCode({ mask })
   }
 
   /**
