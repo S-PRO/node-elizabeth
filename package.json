@@ -2,7 +2,22 @@
   "name": "node-elizabeth",
   "version": "0.0.1",
   "main": "index.js",
-  "repository": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/S-PRO/node-elizabeth"
+  },
+  "keywords": [
+    "fake",
+    "faker-generator",
+    "mocking",
+    "mocks",
+    "fake-content",
+    "fake-data",
+    "javascript",
+    "data",
+    "dummy",
+    "generate"
+  ],
   "license": "MIT",
   "dependencies": {
     "creditcard-generator": "^0.0.7",
