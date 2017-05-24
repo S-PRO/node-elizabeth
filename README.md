@@ -79,7 +79,7 @@ const de = new Personal({ locale: 'de' });
 en.fullName();
 // Inell Britt
 de.fullName();
-Sabrina Gutermuth
+//Sabrina Gutermuth
 ```
 
 Port limitations

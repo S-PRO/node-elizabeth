@@ -26,22 +26,24 @@ import * as NETWORK from './locales/int/network';
 import * as SCIENTIFIC from './locales/int/scientific';
 import * as TRANSPORT from './locales/int/transport';
 
-/**
- * Class for generate the fake data that you can use for
- * working with date and time.
- */
 export class DateTime {
 
-  constructor(props = {}) {
-    const { locale = 'en' } = props;
+  /**
+   * Class for generate the fake data that you can use for
+   * working with date and time.
+   * @param opts {object} Options
+   * @param [opts.locale=en] {string} Provider locale
+   */
+  constructor(opts = {}) {
+    const { locale = 'en' } = opts;
     this.locale = locale;
     this.data = pull('datetime.json', locale);
   }
 
   /**
    * Get a random day of week.
-   * @param opts Options
-   * @param opts.abbr {boolean} Abbreviated name of the day.
+   * @param opts {object} Options
+   * @param [opts.abbr=false] {boolean} Abbreviated name of the day.
    */
   dayOfWeek(opts = {}) {
     const { abbr = false } = opts;
@@ -51,8 +53,8 @@ export class DateTime {
 
   /**
    * Get a random month.
-   * @param opts Options
-   * @param opts.abbr {boolean} if True then will be returned abbreviated month name.
+   * @param opts {object} Options
+   * @param [opts.abbr=false] {boolean} if True then will be returned abbreviated month name.
    */
   month(opts = {}) {
     const { abbr = false } = opts;
@@ -62,9 +64,9 @@ export class DateTime {
 
   /**
    * Generate a random year.
-   * @param opts Options
-   * @param opts.minimum {number} Minimum value.
-   * @param opts.maximum {number} Maximum value
+   * @param opts {object} Options
+   * @param [opts.minimum=1990] {number} Minimum value.
+   * @param [opts.maximum=2050] {number} Maximum value
    */
   year(opts = {}) {
     const { minimum = 1990, maximum = 2050 } = opts;
@@ -86,26 +88,24 @@ export class DateTime {
   }
 }
 
-/**
- * Class for generating codes;
- */
 export class Code {
 
   /**
-   * @param props Options
-   * @param props.locale Current locale
+   * Class for generating codes;
+   * @param opts {object} Options
+   * @param [opts.locale=en] {string} Current locale
    */
-  constructor(props = {}) {
-    const { locale = 'en' } = props;
+  constructor(opts = {}) {
+    const { locale = 'en' } = opts;
     this.locale = locale;
   }
 
   /**
    * Generate custom code using ascii uppercase and random integers.
-   * @param opts Options;
-   * @param opts.mask {string} Mask of code.
-   * @param opts.char {string} Placeholder for characters.
-   * @param opts.digit {string} Placeholder for digits.
+   * @param opts {object} Options;
+   * @param [opts.mask=@###] {string} Mask of code.
+   * @param [opts.char=@] {string} Placeholder for characters.
+   * @param [opts.digit=#] {string} Placeholder for digits.
    */
   customCode(opts = {}) {
     const { mask = '@###', char = '@', digit = '#'} = opts;
@@ -130,7 +130,8 @@ export class Code {
 
   /**
    * Generate a random International Standard Serial Number (ISSN).
-   * @param opts.mask Code mask
+   * @param opts {object} Options
+   * @param [opts.mask=####-####] {string} Code mask
    */
   issn(opts = {}) {
     const { mask = '####-####' } = opts;
@@ -140,8 +141,8 @@ export class Code {
   /**
    * Generate ISBN for current locale. Default is ISBN 10,
    * but you also can use ISBN-13
-   * @param opts Options
-   * @param opts.format ISBN format.
+   * @param opts {object} Options
+   * @param [opts.format=isbn-10] {string} ISBN format.
    */
   isbn(opts = {}) {
     const { format = 'isbn-10' } = opts;
@@ -160,8 +161,8 @@ export class Code {
   /**
    * Generate EAN (European Article Number) code. Default is
    * EAN-13, but you also can use EAN-8.
-   * @param opts Options
-   * @param opts.format Format of EAN.
+   * @param opts {object} Options
+   * @param [opts.format=ean-13] {string} Format of EAN.
    */
   ean(opts = {}) {
     const { format = 'ean-13' } = opts;
@@ -181,8 +182,8 @@ export class Code {
 
   /**
    * Generate a random PIN code.
-   * @param opts Options
-   * @param opts.mask Mask for PIN code.
+   * @param opts {object} Options
+   * @param [opts.mask=####] {string} Mask for PIN code.
    */
   pin(opts = {}) {
     const { mask = '####' } = opts;
@@ -1226,7 +1227,7 @@ export class Internet {
 
   /**
    * Get a random HTTP content type.
-   * @param opts Options
+   * @param opts {object} Options
    * @param opts.mimeType {string} mime type;
    */
   contentType(opts = {}) {
@@ -1236,7 +1237,7 @@ export class Internet {
 
   /**
    * Get a random HTTP status.
-   * @param opts Options
+   * @param opts {object} Options
    * @param opts.codeOnly {boolean} Return only http status code.
    */
   httpStatusCode(opts = {}) {
