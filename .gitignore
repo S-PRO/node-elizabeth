@@ -1,6 +1,5 @@
 .idea/
 node_modules/
 *.log
-doc/
 lib/
 coverage/

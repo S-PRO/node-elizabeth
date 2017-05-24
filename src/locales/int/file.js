@@ -36,7 +36,7 @@ export const EXTENSIONS = {
     ".sql"
   ],
   "text": [
-    ".doc",
+    ".docs",
     ".docx",
     ".log",
     ".rtf",
@@ -466,7 +466,7 @@ export const MIME_TYPES = {
     "application/vnd.cluetrust.cartomobile-config",
     "application/vnd.cluetrust.cartomobile-config-pkg",
     "application/vnd.coffeescript",
-    "application/vnd.collection.doc+json",
+    "application/vnd.collection.docs+json",
     "application/vnd.collection.next+json",
     "application/vnd.collection+json",
     "application/vnd.commerce-battelle",
@@ -1057,7 +1057,7 @@ export const MIME_TYPES = {
     "application/vnd.scribus",
     "application/vnd.sealed.3df",
     "application/vnd.sealed.csf",
-    "application/vnd.sealed.doc",
+    "application/vnd.sealed.docs",
     "application/vnd.sealed.eml",
     "application/vnd.sealed.mht",
     "application/vnd.sealed.net",
