@@ -5,7 +5,7 @@
     "recurse": true
   },
   "source": {
-    "include": [ "src/providers.js"],
+    "include": ["src/providers.js", "./README.md"],
     "includePattern": ".+\\.js(doc)?$"
   },
   "templates": {

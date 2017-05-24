@@ -89,4 +89,13 @@ all methods take `opts` object as their single argument.
 Also first release don't include all the providers,
 custom providers and decorators from original library.
 
+Running tests
+=============
+`npm run test`
+
+Upcoming
+========
+* `Generic` provider from original library
+* Custom providers
+
 
