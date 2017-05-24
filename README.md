@@ -1,4 +1,4 @@
-![](logo.png)
+![logo](logo.png)
 
 Description
 ===========
@@ -15,6 +15,10 @@ addresses, usernames, first names, last names, etc.
 Installation
 ============
 `yarn add node-elizabeth -D`
+
+Documentation
+=============
+[Github pages](https://s-pro.github.io/node-elizabeth/)
 
 Basic Usage
 ===========
