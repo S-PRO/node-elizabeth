@@ -1,5 +1,9 @@
 ![logo](logo.png)
 
+[![npm version](https://badge.fury.io/js/node-elizabeth.png)](https://www.npmjs.com/package/node-elizabeth)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/13b3096bd026452a9b856c5bab8fb2a5)](https://www.codacy.com/app/aybb/node-elizabeth_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=S-PRO/node-elizabeth&amp;utm_campaign=Badge_Grade)
+
+
 Description
 ===========
 node-elizabeth is a port of Python library
