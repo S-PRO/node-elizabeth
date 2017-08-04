@@ -437,8 +437,6 @@ export class Address {
   }
 }
 
-/**
- */
 export class Business {
 
   /**
@@ -883,8 +881,6 @@ export class Personal {
   }
 }
 
-/**
- */
 export class File {
 
   /**
@@ -913,8 +909,6 @@ export class File {
   }
 }
 
-/**
- */
 export class Science {
 
   /**
@@ -957,8 +951,6 @@ export class Science {
   }
 }
 
-/**
- */
 export class Development {
 
   softwareLicense() {
@@ -1038,8 +1030,6 @@ export class Development {
 
 }
 
-/**
- */
 export class Food {
 
   /**
@@ -1089,8 +1079,6 @@ export class Food {
   }
 }
 
-/**
- */
 export class Hardware {
 
   /**
@@ -1184,8 +1172,6 @@ export class Hardware {
   }
 }
 
-/**
- */
 export class ClothingSizes {
 
   /**
@@ -1224,8 +1210,6 @@ export class ClothingSizes {
   }
 }
 
-/**
- */
 export class Internet {
 
   /**
@@ -1396,8 +1380,6 @@ export class Internet {
   }
 }
 
-/**
- */
 export class Transport {
 
   constructor() {
@@ -1434,8 +1416,6 @@ export class Transport {
   }
 }
 
-/**
- */
 export class Path {
 
   /**
@@ -1515,8 +1495,6 @@ export class Path {
   }
 }
 
-/**
- */
 export class UnitSystem {
 
   /**
@@ -1825,5 +1803,139 @@ export class UnitSystem {
       SCIENTIFIC.SI_PREFIXES._sym_ :
       SCIENTIFIC.SI_PREFIXES;
     return _.sample(prefixes[sign])
+  }
+}
+
+export class Structured {
+
+  /**
+   * /**
+   * Provider for structured text data such as CSS, HTML, JSON etc.
+   */
+  constructor(opts = {}) {
+    const { locale = 'en' } = opts;
+    this.locale = locale;
+    this.internet = new Internet();
+    this.text = new Text({ locale });
+  };
+
+  /**
+   * Generates a random snippet of CSS.
+   */
+  css() {
+    const selector = _.sample(DEVELOPMENT.CSS_SELECTORS);
+    const cssSelector = `${selector}${this.text.word()}`;
+    const contTag = _.sample(Object.keys(DEVELOPMENT.HTML_CONTAINER_TAGS));
+    const mrkTag = _.sample(DEVELOPMENT.HTML_MARKUP_TAGS);
+    const base = _.sample([contTag, mrkTag, cssSelector ]);
+    return fmt(
+      '{0} { {1} }', base,
+      [...Array(_.random(2, 7))].reduce(
+        (a, c) => (a += `${this.cssProperty()};`), ''
+      )
+    )
+  }
+
+  /**
+   * Generates a random snippet of CSS that assigns value to a property.
+   */
+  cssProperty() {
+    const prop = _.sample(Object.keys(DEVELOPMENT.CSS_PROPERTIES));
+    let val = DEVELOPMENT.CSS_PROPERTIES[prop];
+    if (_.isArray(val)) {
+      val = _.sample(val);
+    } else if (val === 'color') {
+      val = this.text.hexColor();
+    } else if (val === 'size') {
+      val = `${_.random(1, 99)}${_.sample(DEVELOPMENT.CSS_SIZE_UNITS)}`
+    }
+    return `${prop}: ${val}`
+  }
+
+  /**
+   * Generate a random HTML tag with text inside and some attrs set.
+   * @return {*}
+   */
+  html() {
+    const tagName = _.sample(Object.keys(DEVELOPMENT.HTML_CONTAINER_TAGS));
+    const tagAttrs = DEVELOPMENT.HTML_CONTAINER_TAGS[tagName];
+    const selectedAttrs = _.sampleSize(
+      Object.keys(tagAttrs), _.random(1, Object.keys(tagAttrs).length)
+    );
+    const attrs = [];
+    selectedAttrs.forEach(attr => {
+      attrs.push(fmt('{0}="{1}"', attr, this.htmlAttrValue({ tag: tagName, attr })))
+    });
+    const result = '<{0} {1}>{2}</{0}>';
+    return fmt(result, tagName, attrs.join(' '), this.text.sentence())
+  }
+
+  /**
+   * Random value for specified HTML tag attribute.
+   * @param opts {object} Options
+   * @param opts.tag {string} HTML Tag.
+   * @param opts.attr {string} An attribute of the specified tag.
+   */
+  htmlAttrValue(opts = {}) {
+    const { tag, attr } = opts;
+    let value = DEVELOPMENT.HTML_CONTAINER_TAGS[tag][attr];
+    if (_.isNil(value)) {
+      throw new Error(`Tag ${tag} or attribute ${attr} not supported`);
+    }
+    if (_.isArray(value)) {
+      value = _.sample(value);
+    } else {
+      switch (value) {
+        case 'css':
+          value = this.cssProperty();
+          break;
+        case 'word':
+          value = this.text.word();
+          break;
+        case 'url':
+          value = this.internet.homePage();
+          break;
+        default:
+          throw new Error(`Attribute type ${attr} is not implemented.`);
+      }
+    }
+    return value;
+  }
+
+  /**
+   * Generate random JSON snippet.
+   * @param opts {object} options
+   * @param opts.number {number} Number of top-level items to produce.
+   * @param opts.maxDepth {number} Maximum depth of each top-level item.
+   * @param opts.recursive {boolean} When used recursively, will return a Python object
+   * instead of JSON string.
+   * @return {*}
+   */
+  json(opts = {}) {
+    const {
+      items = 5,
+      maxDepth = 3,
+      recursive = false,
+    } = opts;
+    const root = _.sample([[], {}]);
+    for (let i = 0; i < items; i++ ) {
+      const key = this.text.word();
+      if (maxDepth > 0) {
+        const value = _.sample([
+          this.text.sentence(),
+          _.random(1, 100000),
+          this.json({ maxDepth: maxDepth - 1, recursive: true }),
+        ]);
+        if (_.isArray(root)) {
+          root.push(value);
+        } else {
+          root[key] = value;
+        }
+      }
+      if (recursive) {
+        return root;
+      }
+    }
+    return JSON.stringify(root)
   }
 }
