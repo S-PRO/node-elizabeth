@@ -20,19 +20,19 @@ describe('Test path provider', () => {
   });
 
   it('should be string length === 4 and be in array', () => {
-    let result = path.usersFolder({ gender: 'female' }).split(path_.sep)
+    let result = path.usersFolder().split(path_.sep)
     expect(result).toHaveLength(4);
     expect(FOLDERS).toContain(result[3]);
   });
 
   it('should be string length === 4 and be in array', () => {
-    let result = path.devDir({ gender: 'female' }).split(path_.sep)
+    let result = path.devDir().split(path_.sep)
     expect(result).toHaveLength(5);
     expect(PROGRAMMING_LANGS).toContain(result[4]);
   });
 
   it('should be string length === 4 and be in array', () => {
-    let result = path.projectDir({ gender: 'female' }).split(path_.sep)
+    let result = path.projectDir().split(path_.sep)
     expect(result).toHaveLength(6);
     expect(PROJECT_NAMES).toContain(result[5]);
   });

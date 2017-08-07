@@ -20,7 +20,7 @@ describe('Test code provider', () => {
   });
 
   it('should return mask from 4 chars', () => {
-    expect(code.customCode({mask: "@###", char: '@', digit: '#'})).toHaveLength(4);
+    expect(code.customCode()).toHaveLength(4);
   });
 
   it('should return random item from array', () => {
@@ -29,7 +29,7 @@ describe('Test code provider', () => {
 
   it('should return item from 8  and 13 digits', () => {
     expect(code.ean({format: 'ean-8'})).toMatch(/^[0-9]{8}$/);
-    expect(code.ean({format: 'ean-13'})).toMatch(/^[0-9]{13}$/);
+    expect(code.ean()).toMatch(/^[0-9]{13}$/);
   })
 
   it('should return mask fromat 4 digits - 4 digits', () => {

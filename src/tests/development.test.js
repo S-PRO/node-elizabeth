@@ -18,7 +18,7 @@ describe('Test development provider', () => {
 
   it('should be in array', () => {
     expect(NOSQL).toContain(development.database({noSQL: true}));
-    expect(SQL).toContain(development.database({noSQL: false}));
+    expect(SQL).toContain(development.database());
   });
 
   it('should be in array', () => {

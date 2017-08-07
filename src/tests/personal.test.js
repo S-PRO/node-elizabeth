@@ -16,9 +16,9 @@ const personal = new Personal();
 describe('Test personal provider', () => {
 
   it('should return random age', () => {
-    const res = personal.age({minimum: 20, maximum: 60});
-    expect(res).toBeGreaterThanOrEqual(20);
-    expect(res).toBeLessThanOrEqual(60);
+    const res = personal.age();
+    expect(res).toBeGreaterThanOrEqual(16);
+    expect(res).toBeLessThanOrEqual(66);
     expect(personal._store.age).toEqual(res);
   });
 
@@ -100,9 +100,12 @@ describe('Test personal provider', () => {
     const visa = new RegExp('^4[0-9]{12}(?:[0-9]{3})?$');
     const amex = new RegExp('^3[47][0-9]{13}$');
     const mastercard = new RegExp('^5[1-5][0-9]{14}$');
-    expect(personal.creditCardNumber({ cardType: 'v' })).toMatch(visa);
+    expect(personal.creditCardNumber()).toMatch(visa);
     expect(personal.creditCardNumber({ cardType: 'a' })).toMatch(amex);
     expect(personal.creditCardNumber({ cardType: 'm' })).toMatch(mastercard);
+    expect(
+      () => personal.creditCardNumber({ cardType: 'none' })
+    ).toThrow(new Error('Unsupported card type'))
   });
 
   it('should return random CC expiration date', () => {
@@ -134,15 +137,15 @@ describe('Test personal provider', () => {
   });
 
   it('should return random height', () => {
-    const result = personal.height({ minimum: 1, maximum: 2.5});
-    expect(result).toBeGreaterThanOrEqual(1);
-    expect(result).toBeLessThanOrEqual(2.5);
+    const result = personal.height();
+    expect(result).toBeGreaterThanOrEqual(1.5);
+    expect(result).toBeLessThanOrEqual(2);
   });
 
   it('should return random weight', () => {
-    const result = personal.weight({ minimum: 40, maximum: 120 });
-    expect(result).toBeGreaterThanOrEqual(40);
-    expect(result).toBeLessThanOrEqual(120);
+    const result = personal.weight();
+    expect(result).toBeGreaterThanOrEqual(38);
+    expect(result).toBeLessThanOrEqual(90);
   });
 
   it('should return random blood group', () => {
@@ -198,6 +201,13 @@ describe('Test personal provider', () => {
   });
 
   //TODO: implement personal.telephone();
+
+  it('should return phone number', () => {
+    expect(personal.telephone()).toBeTruthy();
+    const result = personal.telephone({ mask: '###'});
+    expect(result).toHaveLength(3);
+    expect(result).toMatch(/^\d{3}/)
+  });
 
   it('should return random identifier', () => {
     expect(personal.identifier()).toMatch(

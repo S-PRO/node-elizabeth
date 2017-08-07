@@ -6,7 +6,7 @@ const file = new File();
 describe('Test file provider', () => {
 
   it('should be in array', () => {
-    expect(EXTENSIONS['text']).toContain(file.extension({fileType: 'text'}))
+    expect(EXTENSIONS['text']).toContain(file.extension())
   });
 
   it('should be in array or throw error', () => {
@@ -14,7 +14,7 @@ describe('Test file provider', () => {
       file.mimeType({type: "none"});
     }
 
-    expect(MIME_TYPES['application']).toContain(file.mimeType({type: 'application'}));
+    expect(MIME_TYPES['application']).toContain(file.mimeType());
     expect(showError).toThrowError('Unsupported mime type!');
   });
 

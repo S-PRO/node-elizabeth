@@ -131,7 +131,7 @@ describe('Test unitSystem provider', () => {
     expect(showError).toThrowError(`Unsupported sign. Use: 'positive' or 'negative'`);
     expect(SI_PREFIXES._sym_.positive).toContain(unitSystem.prefix({ sign: 'positive', symbol: true }));
     expect(SI_PREFIXES._sym_.negative).toContain(unitSystem.prefix({ sign: 'negative', symbol: true }));
-    expect(SI_PREFIXES.positive).toContain(unitSystem.prefix({ sign: 'positive', symbol: false }));
+    expect(SI_PREFIXES.positive).toContain(unitSystem.prefix());
     expect(SI_PREFIXES.negative).toContain(unitSystem.prefix({ sign: 'negative', symbol: false }));
 
   })

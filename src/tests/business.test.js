@@ -26,9 +26,9 @@ describe('Test business provider', () => {
   });
 
   it('should return random price', () => {
-    const [value, currency] = business.price({ minimum: 1, maximum: 500}).split(' ');
+    const [value, currency] = business.price().split(' ');
     expect(Number(value)).toBeGreaterThanOrEqual(1);
-    expect(Number(value)).toBeLessThanOrEqual(500);
+    expect(Number(value)).toBeLessThanOrEqual(1000);
     expect(value).toMatch(/[0-9]+\.[0-9]{1,2}/g);
     expect(currency).toEqual('$');
   });

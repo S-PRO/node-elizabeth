@@ -859,7 +859,7 @@ export class Personal {
     if (!mask) {
       mask = _.sample(this.data.telephone_fmt);
     }
-    return this.customCode(mask, '@', placeholder)
+    return this.customCode({ mask, digit: placeholder })
   }
 
   /**

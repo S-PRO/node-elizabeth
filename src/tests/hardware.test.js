@@ -25,7 +25,7 @@ describe('Test hardware provider', () => {
   })
 
   it('should be in array', () => {
-    expect(GENERATION).toContain(hardware.generation({abbr: false}));
+    expect(GENERATION).toContain(hardware.generation());
     expect(GENERATION_ABBR).toContain(hardware.generation({abbr: true}));
   });
 

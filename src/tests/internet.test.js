@@ -1,5 +1,5 @@
 import { Internet } from '../providers.js';
-import { pull } from './../util';
+import _ from 'lodash';
 
 import { MIME_TYPES } from '../locales/int/file';
 import * as NETWORK from '../locales/int/network';
@@ -70,6 +70,7 @@ describe('Test internet provider', () => {
     );
   });
 
+  // TODO: Refactor
   it('should return array of random hashtags', () => {
     const result = internet.hashtags();
     expect(result).toHaveLength(4);
@@ -77,6 +78,8 @@ describe('Test internet provider', () => {
     const result_ = internet.hashtags({ quantity: 10, category: 'cars'});
     expect(result_).toHaveLength(10);
     expect(result_.every(ht => NETWORK.HASHTAGS.cars.includes(ht))).toEqual(true);
+    const result__ = internet.hashtags({ quantity: 1 });
+    expect(_.isString(result__)).toBe(true);
   });
 
   it('should return random homepage', () => {

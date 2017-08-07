@@ -25,7 +25,7 @@ describe('Test address provider', () => {
 
   it('should be in array', () => {
     expect(data.state.abbr).toContain(address.state({abbr: true}));
-    expect(data.state.name).toContain(address.state({abbr: false}));
+    expect(data.state.name).toContain(address.state());
   });
 
   it('should be in array', () => {
@@ -65,12 +65,18 @@ describe('Test address provider', () => {
 
   it('should be in array', () => {
     expect(CONTINENT_CODES).toContain(address.continent({code: true}));
-    expect(data.continent).toContain(address.continent({code: false}));
+    expect(data.continent).toContain(address.continent());
   });
 
   it('should be in array', () => {
-    expect(COUNTRIES_ISO['iso2']).toContain(address.countryISO({format: "iso2"}));
-  })
+    expect(COUNTRIES_ISO['iso2']).toContain(address.countryISO());
+  });
+
+  it('should raise error if format is unsupported', () => {
+    expect(
+      () => address.countryISO({ format: 'unsupported' })
+    ).toThrow(new Error(`Unsupported format. Use: ${Object.keys(COUNTRIES_ISO)}`));
+  });
 
 
 });

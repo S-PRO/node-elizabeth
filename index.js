@@ -1,5 +1,10 @@
 'use strict';
 
+// Add browser check for better error experience;
+if (typeof window !== 'undefined') {
+  throw new Error('Currently node-elizabeth supports only NodeJS environment');
+}
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
