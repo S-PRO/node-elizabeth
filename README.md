@@ -1,6 +1,7 @@
 ![logo](logo.png)
 
-[![npm version](https://badge.fury.io/js/node-elizabeth@2x.png)](https://badge.fury.io/js/node-elizabeth)
+[![NPM](https://nodei.co/npm/node-elizabeth.png)](https://npmjs.org/package/node-elizabeth)
+
 [![Build Status](https://travis-ci.org/S-PRO/node-elizabeth.svg?branch=master)](https://travis-ci.org/S-PRO/node-elizabeth)
 [![Coverage Status](https://coveralls.io/repos/github/S-PRO/node-elizabeth/badge.svg?branch=master)](https://coveralls.io/github/S-PRO/node-elizabeth?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/13b3096bd026452a9b856c5bab8fb2a5)](https://www.codacy.com/app/aybb/node-elizabeth_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=S-PRO/node-elizabeth&amp;utm_campaign=Badge_Grade)
